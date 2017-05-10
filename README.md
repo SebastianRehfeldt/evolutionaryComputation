@@ -25,17 +25,22 @@ Measurements:
 ## Implementation
 
 ### Representation
-2D chromosome
+- 2D chromosome
 
 ### Cross-over
-uniform, one-point, two-points cross-over on whole sub-blocks (points are limited to links between sub-blocks) - Sato
-How about fixed initial points? - fix later by random swap in sub-block, not allow to change
+- uniform, one-point, two-points cross-over on whole sub-blocks (points are limited to links between sub-blocks)
+- How about fixed initial points? - fix later by random swap in sub-block, not allow to change
 
 ### Mutation
-for each sub-block: swap non-fixed integers
+- for each sub-block: swap non-fixed integers
 
 
-## Variant
+## Variants
 - Simple as described above
 - More complex operators: maybe forbid incorrect mutations which create duplicates in columns or rows
 - add restart
+
+## Related Papers
+- Solving, Rating and Generating Sudoku Puzzles with GA - Timo Mantere and Janne Koljonen
+- Solving Sudoku with Genetic Operations that Preserve Building Blocks - Yuji Sato, Member, IEEE, and Hazuki Inoue
+- Product Geometric Crossover for the Sudoku Puzzle - Alberto Moraglio, Julian Togelius, Simon Lucas
