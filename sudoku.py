@@ -7,6 +7,7 @@ Sebastian Rehfeldt
 
 from ea_sudoku_simple import *
 from utils import *
+from collections import Counter
 
 import config
 import os
@@ -50,16 +51,47 @@ def fix_givens(givens,dim):
                 elements = indiv[row:row+d,col:col+d]
                 elements = elements.ravel()
                 givs = givens[block]
+                givens_indices = []
                 for k in range(len(givs)):
                     pos = givs[k][0]
+                    givens_indices.append(pos)
                     val = givs[k][1]
                     if not int(elements[pos]) == val:
                         #swap each given to its correct position
-                        giv_pos = np.where(elements==val)[0][0]
-                        elements[pos], elements[giv_pos] = val, int(elements[pos])
+                        if val in elements:
+                            giv_pos = np.where(elements==val)[0][0]
+                            elements[pos], elements[giv_pos] = val, int(elements[pos])
+                        else:
+                            elements[pos] = val
+
+                while not len(set(elements)) == 9:
+                    #remove duplicates
+                    #print(elements)
+
+                    used = set(elements)
+                    missing = list(set(np.random.permutation(9)+1)-used)
+                    duplicates = list((Counter(elements) - Counter(set(elements))).keys())
+                    #print(used)
+                    #print(missing)
+                    #print(duplicates)
+
+                    # find indices for duplicated values
+                    # set first non-given duplicated value to first missing value
+                    dup = int(duplicates[0])
+                    dup_pos = np.where(elements==dup)[0]
+                    #print(dup_pos)
+                    i = 0
+                    while dup_pos[i] in givens_indices:
+                        i+=1
+                    elements[dup_pos[i]] = missing[0]
+
+
+                    
+                    #print(elements)
 
 
                 indiv[row:row+d,col:col+d] = np.reshape(elements,(-1,3))
+                #print(1/0)
                 block +=1
 
         return indiv
@@ -137,11 +169,11 @@ if __name__ == '__main__':
     
     #print(my_fitness(indiv))
 
-    best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), two_points_cross, muta_change, sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func)
-    #display_stat_1(stat,stat_average)
-    #print(best)
+    best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), one_point_cross, swap_muta, sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func)
+    display_stat_1(stat,stat_average)
+    print(best)
     
 
-    #boa,stat_average = run(n_runs, generations, pop_size,cromo_size,prob_muta,prob_cross,tour_sel(tour_size),two_points_cross,muta_change,sel_survivors_elite(elite_percent), my_fitness)
+    #boa,stat_average = run(n_runs, generations, pop_size,cromo_size,prob_muta,prob_cross,tour_sel(tour_size),two_points_cross,swap_muta,sel_survivors_elite(elite_percent), my_fitness)
     #display_stat_n(boa,stat_average)
     #print(min(boa))

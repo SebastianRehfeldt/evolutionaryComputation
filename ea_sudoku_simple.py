@@ -8,6 +8,8 @@ Adjusted by Sebastian Rehfeldt
 
 from random import random,randint, sample, seed, choice
 from operator import itemgetter
+from copy import deepcopy
+import numpy as np
 
 def run(numb_runs,numb_generations,size_pop, size_cromo, prob_mut, prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func):
     statistics = []
@@ -20,7 +22,7 @@ def run(numb_runs,numb_generations,size_pop, size_cromo, prob_mut, prob_cross,se
     aver_gener =  [sum(g_i)/len(g_i) for g_i in stat_gener]
     return best, aver_gener
 
-# Simple [Binary] Evolutionary Algorithm		
+# Simple [Binary] Evolutionary Algorithm        
 def sea(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func):
     # initialize population: indiv = (cromo,fit)
     population = gen_function(size_pop)
@@ -29,8 +31,8 @@ def sea(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_parents,r
     for i in range(numb_generations):
         # parents selection
         mate_pool = sel_parents(population)
-	# Variation
-	# ------ Crossover
+    # Variation
+    # ------ Crossover
         parents = []
         for i in  range(0,size_pop-1,2):
             indiv_1= mate_pool[i]
@@ -38,12 +40,12 @@ def sea(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_parents,r
             children = recombination(indiv_1,indiv_2, prob_cross)
             parents.extend(children) 
         # ------ Mutation
-        descendentes = []
+        descendents = []
         for indiv,fit in parents:
-            novo_indiv = mutation(indiv,prob_mut)
-            descendentes.append((novo_indiv,fitness_func(novo_indiv)))
+            new_indiv = mutation(indiv,prob_mut)
+            descendents.append((new_indiv,fitness_func(new_indiv)))
         # New population
-        population = sel_survivors(population,descendentes)
+        population = sel_survivors(population,descendents)
         # Evaluate the new population
         population = [(indiv[0], fitness_func(indiv[0])) for indiv in population]     
     return best_pop(population)
@@ -52,18 +54,15 @@ def sea(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_parents,r
 # Simple [Binary] Evolutionary Algorithm 
 # Return the best plus, best by generation, average population by generation
 def sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func):
-    # inicializa population: indiv = (cromo,fit)
+    # initialize population: indiv = (cromo,fit)
     population = gen_function(size_pop)
     #print([sum(indiv[0]) for indiv in population])
-    # avalia population
     population = [(indiv[0], fitness_func(indiv[0])) for indiv in population]
 
-    # para a estatistica
     stat = [best_pop(population)[1]]
     stat_aver = [average_pop(population)]
     
     for i in range(numb_generations):
-        # selecciona parents
         mate_pool = sel_parents(population)
     # Variation
     # ------ Crossover
@@ -74,13 +73,13 @@ def sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_
             children = recombination(cromo_1,cromo_2, prob_cross)
             parents.extend(children) 
         # ------ Mutation
-        descendentes = []
+        descendents = []
         for indiv,fit in parents:
-            novo_indiv = mutation(indiv,prob_mut)
-            descendentes.append((novo_indiv,fitness_func(novo_indiv)))
+            new_indiv = mutation(indiv,prob_mut)
+            new_indiv = fix_func(new_indiv)
+            descendents.append((new_indiv,fitness_func(new_indiv)))
         # New population
-        population = sel_survivors(population,descendentes)
-        # Avalia nova _population
+        population = sel_survivors(population,descendents)
         population = [(indiv[0], fitness_func(indiv[0])) for indiv in population] 
     
     # Estatistica
@@ -90,70 +89,65 @@ def sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_
     return best_pop(population),stat, stat_aver
 
 
-# Variation operators: Binary mutation	    
-def muta_change(indiv,prob_muta):
-    # Mutation by gene
+# Variation operators: Swap mutation for sub-blocks        
+def swap_muta(indiv,prob_muta):
+    # Mutation by sub-blocks
     cromo = indiv[:]
 
-    orig_sum = sum(cromo)
-    for i in range(len(indiv)):
-        #change sets of cities (if one city is changed, a random city of the other set is also changed)
-        cromo = muta_change_gene(cromo,i,prob_muta)
+    #for each block, swap two cities
+    d = int(np.sqrt(len(indiv)))
+    for i in range(d):
+            for j in range(d):
+                row = i*d
+                col = j*d
+                elements = cromo[row:row+d,col:col+d].ravel()
+                 
+                value = random()
+                if value < prob_muta:
+                    #swap numbers
+                    rand1 = randint(0,8)
+                    rand2 = randint(0,8)
+                    while rand1==rand2:
+                        rand2 = randint(0,8)
 
-    new_sum = sum(cromo)
-
-    if not orig_sum == new_sum:
-        print(cromo)
-        print(1/0)
+                    elements[rand1],elements[rand2] = elements[rand2],elements[rand1]
+                    cromo[row:row+d,col:col+d] = np.reshape(elements,(-1,3))
 
     return cromo
 
-def muta_change_gene(chromo, index, prob_muta):
-    value = random()
-    originalSet = chromo[index]
-
-    if value < prob_muta:
-        #flip random bit of other set
-        if originalSet == 0:
-            #flip a random 1
-            indices = [i for i in range(len(chromo)) if chromo[i] == 1]
-            chromo[choice(indices)] = 0
-        else:
-            #flip a random 0
-            indices = [i for i in range(len(chromo)) if chromo[i] == 0]
-            chromo[choice(indices)] = 1
-
-        #flip bit
-        chromo[index] ^= 1
-    return chromo
 
 # Variation Operators :Crossover
 def one_point_cross(indiv_1, indiv_2,prob_cross):
-	value = random()
-	if value < prob_cross:
-	    cromo_1 = indiv_1[0]
-	    cromo_2 = indiv_2[0]
-	    pos = randint(0,len(cromo_1))
-	    f1 = cromo_1[0:pos] + cromo_2[pos:]
-	    f2 = cromo_2[0:pos] + cromo_1[pos:]
-	    return ((f1,0),(f2,0))
-	else:
-	    return (indiv_1,indiv_2)
-	    
+    #swaps two rows between indivs
+    value = random()
+    if value < prob_cross:
+        rand1 = randint(0,8)
+        rand2 = randint(0,8)
+        while rand1==rand2:
+            rand2 = randint(0,8)
+
+        temp = deepcopy(indiv_1[0][rand1,])
+        indiv_1[0][rand1,] = indiv_2[0][rand2,]
+        indiv_2[0][rand2,] = temp
+
+        return (indiv_1,indiv_2)
+    else:
+        return (indiv_1,indiv_2)
+        
 def two_points_cross(indiv_1, indiv_2,prob_cross):
-	value = random()
-	if value < prob_cross:
-	    cromo_1 = indiv_1[0]
-	    cromo_2 = indiv_2[0]	    
-	    pc= sample(range(len(cromo_1)),2)
-	    pc.sort()
-	    pc1,pc2 = pc
-	    f1= cromo_1[:pc1] + cromo_2[pc1:pc2] + cromo_1[pc2:]
-	    f2= cromo_2[:pc1] + cromo_1[pc1:pc2] + cromo_2[pc2:]
-	    return ((f1,0),(f2,0))
-	else:
-	    return (indiv_1,indiv_2)
-	
+    value = random()
+    if value < prob_cross:
+        cromo_1 = indiv_1[0]
+        cromo_2 = indiv_2[0]        
+        pc= sample(range(len(cromo_1)),2)
+        pc.sort()
+        pc1,pc2 = pc
+        f1= cromo_1[:pc1] + cromo_2[pc1:pc2] + cromo_1[pc2:]
+        f2= cromo_2[:pc1] + cromo_1[pc1:pc2] + cromo_2[pc2:]
+        return ((f1,0),(f2,0))
+    else:
+        return (indiv_1,indiv_2)
+    
 def uniform_cross(indiv_1, indiv_2,prob_cross):
     value = random()
     if value < prob_cross:
@@ -193,6 +187,7 @@ def one_tour(population,size):
 
 
 # Survivals Selection: elitism
+# minimization
 def sel_survivors_elite(elite):
     def elitism(parents,offspring):
         size = len(parents)
@@ -204,9 +199,11 @@ def sel_survivors_elite(elite):
     return elitism
 
 
-# Auxiliary    
+# Auxiliary
+# minimization
 def best_pop(population):
     population.sort(key=itemgetter(1),reverse=False)
+
     return population[0]
 
 def average_pop(population):
