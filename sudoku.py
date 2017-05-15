@@ -7,27 +7,107 @@ Sebastian Rehfeldt
 
 from ea_sudoku_simple import *
 from utils import *
+
 import config
+import os
+import numpy as np
 
-import os 
+
+# Initialize population
+def gera_pop(dimension,fix_func):
+    def _gera_pop(size_pop):
+        return [(gera_indiv(dimension,fix_func),0) for i in range(size_pop)]
+    return _gera_pop
+
+def gera_indiv(dim,fix_func):
+    # fill blocks with random permutation and fix givens later
+
+    indiv = np.zeros((dim,dim))
+    d = int(np.sqrt(dim))
+
+    for i in range(d):
+            for j in range(d):
+                perm = np.random.permutation(9)+1
+                row = i*d
+                col = j*d
+
+                indiv[row:row+d,col:col+d] = np.reshape(perm,(-1,3))
+    
+    indiv = fix_func(indiv)
+
+    return indiv
+
+def fix_givens(givens,dim):
+    def _fix_givens(indiv):
+        #TODO
+        d = int(np.sqrt(dim))
+        #for each block fix the givens
+        block = 0
+        for i in range(d):
+            for j in range(d):
+                row = i*d
+                col = j*d
+                elements = indiv[row:row+d,col:col+d]
+                elements = elements.ravel()
+                givs = givens[block]
+                for k in range(len(givs)):
+                    pos = givs[k][0]
+                    val = givs[k][1]
+                    if not int(elements[pos]) == val:
+                        #swap each given to its correct position
+                        giv_pos = np.where(elements==val)[0][0]
+                        elements[pos], elements[giv_pos] = val, int(elements[pos])
 
 
-def fitness(givens):
+                indiv[row:row+d,col:col+d] = np.reshape(elements,(-1,3))
+                block +=1
+
+        return indiv
+    return _fix_givens
+
+def fitness(dimension):
     def fitness_(indiv):
-        
-        return evaluate(phenotype(indiv),givens)
+        return evaluate(phenotype(indiv),dimension)
     return fitness_
 
 def phenotype(indiv):
-    
-    return []
+    #should be the same as the genotype
+    return indiv
 
 
-def evaluate(pheno,graph):
-    
+def evaluate(pheno,dimension):
+    conflicts = 0
 
-    return []
+    #There are no conflicts inside the sub-boxes as the algorithm is implemented to keep this constraint
+    conflicts += calculateRowConflicts(pheno,dimension)
+    conflicts += calculateColumnConflicts(pheno,dimension)
+    conflicts += calculateDiagonalConflicts(pheno,dimension)
 
+    return conflicts
+
+def calculateRowConflicts(pheno,dimension):
+    conflicts = 0
+    for i in range(dimension):
+        conflicts += dimension-len(set(pheno[i]))
+    return conflicts
+
+def calculateColumnConflicts(pheno,dimension):
+    conflicts = 0
+    for i in range(dimension):
+        conflicts += dimension-len(set(pheno[:,i]))
+    return conflicts
+
+
+def calculateDiagonalConflicts(pheno,dimension):
+    conflicts = 0
+    diagonal1 = []
+    diagonal2 = []
+    for i in range(dimension):
+        diagonal1.append(pheno[i,i])
+        diagonal2.append(pheno[dimension-i-1,i])
+    conflicts += dimension-len(set(diagonal1))
+    conflicts += dimension-len(set(diagonal2))
+    return conflicts
 
 
 
@@ -35,12 +115,17 @@ if __name__ == '__main__':
     directory = os.getcwd()
     givens, dimension = readData(directory+"/cases/"+config.file)
 
-    #indiv = [1,0,0,1]
+    #indiv = np.array([[2, 2], [2, 1]], np.int32)
     #pheno = phenotype(indiv)
     #print(pheno)
+    #print(evaluate(pheno,2))
 
-    cromo_size = dimension**2
-    my_fitness = fitness(givens)
+    cromo_size = dimension**3 #total number of elements
+    dimension = dimension**2 #dimension of genotype array
+
+    fix_func = fix_givens(givens,dimension)
+    gen_function = gera_pop(dimension, fix_func)
+    my_fitness = fitness(dimension)
 
     n_runs = config.runs
     generations = config.generations
@@ -52,8 +137,7 @@ if __name__ == '__main__':
     
     #print(my_fitness(indiv))
 
-    #pass givens to ea or create initial pop here
-    #best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), two_points_cross, muta_change, sel_survivors_elite(elite_percent), my_fitness)
+    best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), two_points_cross, muta_change, sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func)
     #display_stat_1(stat,stat_average)
     #print(best)
     

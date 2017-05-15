@@ -5,6 +5,7 @@ Adjusted by Sebastian Rehfeldt
 """
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 # auxiliary 
 def display(indiv, phenotype):
@@ -31,23 +32,38 @@ def display_stat_n(boa,average_best):
     plt.show()
     
 def readData(file):
+    # givens are saved in a dict
+    # keys correspond to blocks
+    # values are tuples containing a 1D position and a value
+
     givens = {}
 
     with  open(file) as f:
-        dimension = f.readline()
+        dimension = int(f.readline())
+        sudoku = np.zeros((dimension**2,dimension**2))
+
         data = f.readlines()
-        i = 0
+        i=0
         for line in data:
-            givens[i] = []
             elements = line.split()
             j=0
             for elem in elements:
-                elem = int(elem)
-                if not elem == 0:
-                    givens[i].append((j,elem))
+                sudoku[i][j] = int(elem)
                 j+=1
-
             i+=1
-    
+
+    block = 0
+    for i in range(dimension):
+            for j in range(dimension):
+                row = i*dimension
+                col = j*dimension
+                elements = sudoku[row:row+dimension,col:col+dimension]
+                elements = elements.ravel()
+                givens[block] = []
+                for k in range(len(elements)):
+                    if not elements[k] == 0:
+                        givens[block].append((k,int(elements[k])))
+                block += 1
+
     f.closed
-    return givens, int(dimension)
+    return givens, dimension
