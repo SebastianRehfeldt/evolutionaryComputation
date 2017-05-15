@@ -38,8 +38,8 @@ def gera_indiv(dim,fix_func):
     return indiv
 
 def fix_givens(givens,dim):
+    cross_func = config.cross_over
     def _fix_givens(indiv):
-        #TODO
         d = int(np.sqrt(dim))
         #for each block fix the givens
         block = 0
@@ -63,32 +63,25 @@ def fix_givens(givens,dim):
                         else:
                             elements[pos] = val
 
-                while not len(set(elements)) == 9:
-                    #remove duplicates
-                    #print(elements)
+                if cross_func == "row":
+                    while not len(set(elements)) == 9:
+                        #remove duplicates
 
-                    used = set(elements)
-                    missing = list(set(np.random.permutation(9)+1)-used)
-                    duplicates = list((Counter(elements) - Counter(set(elements))).keys())
-                    #print(used)
-                    #print(missing)
-                    #print(duplicates)
+                        used = set(elements)
+                        missing = list(set(np.random.permutation(9)+1)-used)
+                        duplicates = list((Counter(elements) - Counter(set(elements))).keys())
 
-                    # find indices for duplicated values
-                    # set first non-given duplicated value to first missing value
-                    dup = int(duplicates[0])
-                    dup_pos = np.where(elements==dup)[0]
-                    #print(dup_pos)
-                    i = 0
-                    while dup_pos[i] in givens_indices:
-                        i+=1
-                    elements[dup_pos[i]] = missing[0]
-                    
-                    #print(elements)
+                        # find indices for duplicated values
+                        # set first non-given duplicated value to first missing value
+                        dup = int(duplicates[0])
+                        dup_pos = np.where(elements==dup)[0]
+                        i = 0
+                        while dup_pos[i] in givens_indices:
+                            i+=1
+                        elements[dup_pos[i]] = missing[0]
 
 
                 indiv[row:row+d,col:col+d] = np.reshape(elements,(-1,3))
-                #print(1/0)
                 block +=1
 
         return indiv
@@ -110,7 +103,7 @@ def evaluate(pheno,dimension):
     #There are no conflicts inside the sub-boxes as the algorithm is implemented to keep this constraint
     conflicts += calculateRowConflicts(pheno,dimension)
     conflicts += calculateColumnConflicts(pheno,dimension)
-    conflicts += calculateDiagonalConflicts(pheno,dimension)
+    #conflicts += calculateDiagonalConflicts(pheno,dimension)
 
     return conflicts
 
@@ -164,13 +157,18 @@ if __name__ == '__main__':
     tour_size = config.tour_size
     elite_percent = config.elite_percent
     
+    if config.cross_over == "block":
+        cross_function = block_swap_cross
+    else:
+        cross_function = row_swap_cross
+
     #print(my_fitness(indiv))
 
-    best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), one_point_cross, swap_muta, sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func, givens)
-    display_stat_1(stat,stat_average)
-    print(best)
+    #best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), cross_function, swap_muta, sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func, givens)
+    #display_stat_1(stat,stat_average)
+    #print(best)
     
 
-    #boa,stat_average = run(n_runs, generations, pop_size,cromo_size,prob_muta,prob_cross,tour_sel(tour_size),two_points_cross,swap_muta,sel_survivors_elite(elite_percent), my_fitness)
-    #display_stat_n(boa,stat_average)
-    #print(min(boa))
+    best,stat_average = run(n_runs, generations, pop_size,cromo_size,prob_muta,prob_cross,tour_sel(tour_size),cross_function,swap_muta,sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func, givens)
+    display_stat_n(best,stat_average)
+    print(min(best))
