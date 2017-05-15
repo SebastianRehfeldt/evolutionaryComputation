@@ -1,6 +1,5 @@
 """
-
-graph_bisection.py
+sudoku.py
 Sebastian Rehfeldt
 
 """
@@ -84,8 +83,6 @@ def fix_givens(givens,dim):
                     while dup_pos[i] in givens_indices:
                         i+=1
                     elements[dup_pos[i]] = missing[0]
-
-
                     
                     #print(elements)
 
@@ -169,7 +166,7 @@ if __name__ == '__main__':
     
     #print(my_fitness(indiv))
 
-    best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), one_point_cross, swap_muta, sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func)
+    best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), one_point_cross, swap_muta, sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func, givens)
     display_stat_1(stat,stat_average)
     print(best)
     
