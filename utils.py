@@ -21,7 +21,7 @@ def display_stat_1(best,average):
     plt.legend(loc='best')
     plt.show()
     
-def display_stat_n(boa,average_best):
+def display_stat_n(boa,average_best,i):
     generations = list(range(len(boa)))
     plt.title('Performance over runs')
     plt.xlabel('Generation')
@@ -29,7 +29,9 @@ def display_stat_n(boa,average_best):
     plt.plot(generations, boa, label='Best of All')
     plt.plot(generations,average_best,label='Average of Bests')
     plt.legend(loc='best')
-    plt.show()
+    plt.savefig('./experiments/file'+str(i)+'.png')
+    plt.close()
+
     
 def readData(file):
     # givens are saved in a dict

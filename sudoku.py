@@ -134,21 +134,8 @@ def calculateDiagonalConflicts(pheno,dimension):
 
 
 if __name__ == '__main__':
-    directory = os.getcwd()
-    givens, dimension = readData(directory+"/cases/"+config.file)
-
-    #indiv = np.array([[2, 2], [2, 1]], np.int32)
-    #pheno = phenotype(indiv)
-    #print(pheno)
-    #print(evaluate(pheno,2))
-
-    cromo_size = dimension**3 #total number of elements
-    dimension = dimension**2 #dimension of genotype array
-
-    fix_func = fix_givens(givens,dimension)
-    gen_function = gera_pop(dimension, fix_func)
-    my_fitness = fitness(dimension)
-
+    
+    # GET CONFIG
     n_runs = config.runs
     generations = config.generations
     pop_size = config.pop_size
@@ -162,13 +149,38 @@ if __name__ == '__main__':
     else:
         cross_function = row_swap_cross
 
-    #print(my_fitness(indiv))
+    # FOR EACH FILE
+    directory = os.getcwd()
+    files = config.test_files
 
-    #best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), cross_function, swap_muta, sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func, givens)
-    #display_stat_1(stat,stat_average)
-    #print(best)
+    best_solutions = []
+    aver_solutions = []
+
+    for i in range(len(files)):
+        file = files[i]
+        givens, dimension = readData(directory+"/cases/"+file)
+
     
+        cromo_size = dimension**3 #total number of elements
+        dimension = dimension**2 #dimension of genotype array
 
-    best,stat_average = run(n_runs, generations, pop_size,cromo_size,prob_muta,prob_cross,tour_sel(tour_size),cross_function,swap_muta,sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func, givens)
-    display_stat_n(best,stat_average)
-    print(min(best))
+        fix_func = fix_givens(givens,dimension)
+        gen_function = gera_pop(dimension, fix_func)
+        my_fitness = fitness(dimension)
+
+        #best, stat, stat_average = sea_for_plot(generations, pop_size, cromo_size, prob_muta, prob_cross, tour_sel(tour_size), cross_function, swap_muta, sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func, givens)
+        #display_stat_1(stat,stat_average)
+        #print(best)
+
+        best,stat_average = run(n_runs, generations, pop_size,cromo_size,prob_muta,prob_cross,tour_sel(tour_size),cross_function,swap_muta,sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func, givens)
+        display_stat_n(best,stat_average,i)
+
+        # write best to file     
+        best_solutions.append(min(best))   
+        aver_solutions.append(np.mean(best))
+
+    f = open('./experiments/final_conflicts.csv', 'w')
+    f.write('file,best,average\n')
+    for i in range(len(best_solutions)):
+        f.write(str(i+1)+","+str(best_solutions[i])+","+str(aver_solutions[i])+"\n")
+    f.close()
