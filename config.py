@@ -1,7 +1,7 @@
-runs = 3
-generations = 100
+runs = 10
+generations = 10000
 pop_size = 150
-prob_muta = 0.1
+prob_muta = 0.02
 prob_cross = 0.0
 tour_size = 3
 elite_percent = 0.1
