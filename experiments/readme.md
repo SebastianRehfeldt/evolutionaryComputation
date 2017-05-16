@@ -8,9 +8,7 @@ The final evaluation is based on 30 runs with 100k generations and all files. Fo
 
 
 *** Metrics
-- Furthermore, it is measured how often the runs found the solution for the sudoku.
-- Also the best and average generation for finding the solution are good metrics for the algorithm quality.
-
-
-- The minimum and average number of conflicts after all generations are metrics used for evaluation. (final_conflicts.csv)
-- A plot for the performance over generations can also be used for analysis.
+- The number of runs where the solution for the sudoku was found.
+- The best and average generation when the solution was found.
+- The minimum and average number of conflicts after all generations (final_conflicts.csv)
+- Plots for the performance over generations for each file can also be used for the analysis.

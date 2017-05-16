@@ -10,15 +10,17 @@ This project was done as a student work for a course at the University of Coimbr
 
 ## Test Cases & Evaluation
 
+The project uses sudokus from the following paper:
+https://www.researchgate.net/publication/224180108_Solving_Sudoku_with_genetic_operations_that_preserve_building_blocks
+
 The algorithm is tested on Suduko puzzles of different orders which can be found here:
 http://www.ee.cityu.edu.hk/~rcheung/FPT/FPT09/comp/benchmarks.html
 
-Consult also examples from:
-https://www.researchgate.net/publication/224180108_Solving_Sudoku_with_genetic_operations_that_preserve_building_blocks
 
 Measurements:
-- generation when optimal solution was found
-- conflicts after some fixed generations or time
+- best, average generation when solution was found
+- best, average conflicts after fixed number of generations
+- plot for performance over runs
 - runtime
 
 
@@ -28,17 +30,19 @@ Measurements:
 - 2D chromosome
 
 ### Cross-over
-- uniform, one-point, two-points cross-over on whole sub-blocks (points are limited to links between sub-blocks)
-- How about fixed initial points? - fix later by random swap in sub-block, not allow to change
+- block or row swap cross-over
+- givens are swapped to original places afterwards
+- sub-blocks were transformed into valid permutations in case duplicated numbers exist
 
 ### Mutation
-- for each sub-block: swap non-fixed integers
+- for each sub-block: swap non-given numbers
 
 
 ## Variants
-- Simple as described above
-- More complex operators: maybe forbid incorrect mutations which create duplicates in columns or rows
-- add restart
+- Simple as described above (containing, swap mutation and swap cross-overs as well as a fitness function which counts conflicts only)
+- More complex operators (future)
+- Better initialization (future)
+- Different EA procedures (random restart or similar, future)
 
 ## Related Papers
 - Solving, Rating and Generating Sudoku Puzzles with GA - Timo Mantere and Janne Koljonen

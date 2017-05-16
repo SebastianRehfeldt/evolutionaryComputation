@@ -13,14 +13,23 @@ import numpy as np
 
 def run(numb_runs,numb_generations,size_pop, size_cromo, prob_mut, prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func,givens):
     statistics = []
+    generations = []
+    final_conflicts = []
     for i in range(numb_runs):
         seed(i)
-        best, stat_best, stat_aver = sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func,givens)
+        best, stat_best, stat_aver,gen = sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func,givens)
+        final_conflicts.append(best[1])
         statistics.append(stat_best)
+        generations.append(gen)
     stat_gener = list(zip(*statistics))
     best = [min(g_i) for g_i in stat_gener] # minimization
     aver_gener =  [sum(g_i)/len(g_i) for g_i in stat_gener]
-    return best, aver_gener
+
+    best_generation = min(generations)
+    aver_generation = np.mean(generations)
+    numb_solution = len([x for x in generations if x < numb_generations-1])
+
+    return best, aver_gener,final_conflicts,best_generation,aver_generation,numb_solution
 
 # Return the best plus, best by generation, average population by generation
 def sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func, givens):
@@ -57,8 +66,15 @@ def sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_
         # Estatistica
         stat.append(best_pop(population)[1])
         stat_aver.append(average_pop(population))
+
+        if best_pop(population)[1] == 0:
+            #fill stat with zeros to allow plot to show values until final generation
+            while len(stat)<numb_generations:
+                stat.append(0)
+            #stop algorithm as it found the solution
+            break
     
-    return best_pop(population),stat, stat_aver
+    return best_pop(population),stat, stat_aver,i
 
 
 # Variation operators: Swap mutation for sub-blocks        

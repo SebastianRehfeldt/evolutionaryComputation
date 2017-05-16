@@ -1,5 +1,5 @@
-runs = 10
-generations = 10
+runs = 30
+generations = 10000
 pop_size = 150
 prob_muta = 0.3
 prob_cross = 0.0
