@@ -40,9 +40,9 @@ Measurements:
 
 ## Variants
 - Simple as described above (containing, swap mutation and swap cross-overs as well as a fitness function which counts conflicts only)
+- Different EA procedures (random restart or injection of fresh individuals, future)
 - More complex operators (future)
 - Better initialization (future)
-- Different EA procedures (random restart or similar, future)
 
 ## Related Papers
 - Solving, Rating and Generating Sudoku Puzzles with GA - Timo Mantere and Janne Koljonen

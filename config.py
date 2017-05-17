@@ -1,8 +1,8 @@
 runs = 10
 generations = 10000
 pop_size = 150
-prob_muta = 0.02
-prob_cross = 0.0
+prob_muta = 0.1
+prob_cross = 0.1 #005 01 03 05 08
 tour_size = 3
 elite_percent = 0.1
 
@@ -11,6 +11,8 @@ cross_over = "block" #row or block
 
 
 file = ["sudoku_difficult_38.txt"]
+
+final = ["sudoku_ai_escargot.txt"]
 
 
 test_files = ["sudoku_easy_38.txt",
