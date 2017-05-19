@@ -21,7 +21,6 @@ Measurements:
 - best, average generation when solution was found
 - best, average conflicts after fixed number of generations
 - plot for performance over runs
-- runtime
 
 
 ## Implementation
@@ -37,12 +36,13 @@ Measurements:
 ### Mutation
 - for each sub-block: swap non-given numbers
 
+### Random Immigrants
+- as the algorithm often gets stuck in local optima, the population is refreshed with new individuals after a certain amount of generation without improvement
 
 ## Variants
-- Simple as described above (containing, swap mutation and swap cross-overs as well as a fitness function which counts conflicts only)
-- Different EA procedures (random restart or injection of fresh individuals, future)
-- More complex operators (future)
-- Better initialization (future)
+- Mutation only
+- Mutation + Cross-over (swap blocks or rows)
+- Random Immigrants
 
 ## Related Papers
 - Solving, Rating and Generating Sudoku Puzzles with GA - Timo Mantere and Janne Koljonen

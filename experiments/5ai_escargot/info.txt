@@ -1,0 +1,11 @@
+AI Escargot
+20    runs
+100k  generations
+0.5   perc
+1000  generations without improvement
+
+muta cross
+0.1  0.1
+0.2  0.1
+0.1  0
+0.2  0

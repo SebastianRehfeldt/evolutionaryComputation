@@ -1,0 +1,7 @@
+5     files
+20    runs
+100k  generations
+0.5   perc
+1000  generations without improvement
+0.x   muta
+0.x   cross
