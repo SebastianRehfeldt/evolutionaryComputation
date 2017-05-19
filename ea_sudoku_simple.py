@@ -9,6 +9,7 @@ Adjusted by Sebastian Rehfeldt
 from random import random,randint, sample, seed, choice
 from operator import itemgetter
 from copy import deepcopy
+from config import *
 import numpy as np
 
 def run(numb_runs,numb_generations,size_pop, size_cromo, prob_mut, prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func,givens):
@@ -40,8 +41,20 @@ def sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_
     stat = [best_pop(population)[1]]
     stat_aver = [average_pop(population)]
     
+    gen_without_improvement = 0
+    current_best = 81
+    
     for i in range(numb_generations):
         old_pop = deepcopy(population)
+
+        if should_restart and gen_without_improvement==restart_generations:
+            gen_without_improvement=0
+            old_pop_size = int(len(population)*(1-immigrant_perc))
+            population = population[0:old_pop_size]
+            immigrants = gen_function(size_pop-old_pop_size)
+            [population.append(immigrant) for immigrant in immigrants]
+            population = [(indiv[0], fitness_func(indiv[0])) for indiv in population]
+
         mate_pool = sel_parents(population)
         # Variation
         # ------ Crossover
@@ -67,12 +80,20 @@ def sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_
         stat.append(best_pop(population)[1])
         stat_aver.append(average_pop(population))
 
-        if best_pop(population)[1] == 0:
+        best_fitness = best_pop(population)[1]
+        if best_fitness == 0:
             #fill stat with zeros to allow plot to show values until final generation
             while len(stat)<numb_generations:
                 stat.append(0)
             #stop algorithm as it found the solution
             break
+
+        #count generations without improvement for restart
+        if best_fitness<current_best:
+            gen_without_improvement = 0
+            current_best=deepcopy(best_fitness)
+        else:
+            gen_without_improvement += 1
     
     return best_pop(population),stat, stat_aver,i
 

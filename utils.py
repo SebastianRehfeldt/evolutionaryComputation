@@ -29,7 +29,7 @@ def display_stat_n(boa,average_best,i,prob_muta,cross_function):
     plt.plot(generations, boa, label='Best of All')
     plt.plot(generations,average_best,label='Average of Bests')
     plt.legend(loc='best')
-    plt.savefig('./experiments/file'+str(i)+'_'+cross_function+'_'+str(prob_muta)+'.png')
+    plt.savefig('./experiments/file'+str(i)+'_'+str(cross_function)+'_'+str(prob_muta)+'.png')
     plt.close()
 
     
