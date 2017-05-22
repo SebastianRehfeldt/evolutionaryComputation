@@ -21,7 +21,7 @@ def display_stat_1(best,average):
     plt.legend(loc='best')
     plt.show()
     
-def display_stat_n(boa,average_best,i,prob_muta,cross_function):
+def display_stat_n(boa,average_best,i):
     generations = list(range(len(boa)))
     plt.title('Performance over runs')
     plt.xlabel('Generation')
@@ -29,7 +29,7 @@ def display_stat_n(boa,average_best,i,prob_muta,cross_function):
     plt.plot(generations, boa, label='Best of All')
     plt.plot(generations,average_best,label='Average of Bests')
     plt.legend(loc='best')
-    plt.savefig('./experiments/file'+str(i)+'_'+str(cross_function)+'_'+str(prob_muta)+'.png')
+    plt.savefig('./experiments/file'+str(i)+'.png')
     plt.close()
 
     
