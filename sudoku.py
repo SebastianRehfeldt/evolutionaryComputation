@@ -151,7 +151,7 @@ if __name__ == '__main__':
 
     # FOR EACH FILE
     directory = os.getcwd()
-    files = config.final_file5
+    files = config.final_file1
 
     best_solutions = []
     aver_solutions = []
