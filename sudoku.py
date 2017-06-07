@@ -151,7 +151,7 @@ if __name__ == '__main__':
 
     # FOR EACH FILE
     directory = os.getcwd()
-    files = config.final_file1
+    files = config.file
 
     best_solutions = []
     aver_solutions = []
@@ -176,7 +176,7 @@ if __name__ == '__main__':
         #print(best)
 
         best,stat_average,final_conflicts,best_generation,aver_generation,numb_solution = run(n_runs, generations, pop_size,cromo_size,prob_muta,prob_cross,tour_sel(tour_size),cross_function,swap_muta,sel_survivors_elite(elite_percent), my_fitness, gen_function, fix_func, givens)
-        display_stat_n(best,stat_average,5)
+        display_stat_n(best,stat_average,i)
 
         # collect for printing to files
         best_solutions.append(min(final_conflicts))   
@@ -186,13 +186,13 @@ if __name__ == '__main__':
         numb_solutions.append(numb_solution)
 
     # print results to files
-    f = open('./experiments/final_conflicts_5'+'.csv', 'w')
+    f = open('./experiments/final_conflicts.csv', 'w')
     f.write('file,best,average\n')
     for i in range(len(best_solutions)):
         f.write(str(i+1)+","+str(best_solutions[i])+","+str(aver_solutions[i])+"\n")
     f.close()
 
-    f2 = open('./experiments/generations_5'+'.csv', 'w')
+    f2 = open('./experiments/generations.csv', 'w')
     f2.write('file,best_generation,average_generation,found_solutions\n')
     for i in range(len(best_generations)):
         f2.write(str(i+1)+","+str(best_generations[i])+","+str(aver_generations[i])+","+str(numb_solutions[i])+"\n")

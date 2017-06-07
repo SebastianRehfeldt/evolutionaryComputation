@@ -19,6 +19,8 @@ def run(numb_runs,numb_generations,size_pop, size_cromo, prob_mut, prob_cross,se
     for i in range(numb_runs):
         seed(i)
         best, stat_best, stat_aver,gen = sea_for_plot(numb_generations,size_pop, size_cromo, prob_mut,prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func,givens)
+        print(best[0])
+        print(best[1])
         final_conflicts.append(best[1])
         statistics.append(stat_best)
         generations.append(gen)

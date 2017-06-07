@@ -1,7 +1,7 @@
 ### General ###
-runs = 20
-generations = 10
-pop_size = 15
+runs = 1
+generations = 2000
+pop_size = 150
 prob_muta = 0.2
 prob_cross = 0.0
 tour_size = 3
@@ -18,7 +18,7 @@ cross_over = "block"
 
 
 ### FILES ###
-file = ["sudoku_difficult_38.txt"]
+file = ["sudoku_easy_38.txt"]
 
 #30 runs, 100k generations (for each file only with mutation and mutation+block-cross-over)
 final_file1 = ["sudoku_easy_38.txt"]
